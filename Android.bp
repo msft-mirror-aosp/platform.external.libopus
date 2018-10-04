@@ -16,8 +16,10 @@ cc_library_shared {
 
     sanitize: {
         integer_overflow: true,
+        misc_undefined: ["bounds"],
         diag: {
             integer_overflow: true,
+            misc_undefined: ["bounds"],
         },
         blacklist: "libopus_blacklist.txt",
     },
