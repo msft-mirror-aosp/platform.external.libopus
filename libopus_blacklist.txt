@@ -1,4 +1,8 @@
 [integer]
+# celt/celt_decoder.c:1055:61: 0 - 1 cannot be represented in type 'unsigned int'
+fun:celt_decode_with_ec
+# celt/celt_encoder.c:2171:75: 0 - 1 cannot be represented in type 'unsigned int'
+fun:celt_encode_with_ec
 fun:celt_lcg_rand
 # celt/entcode.h:131: negation of 100 cannot be represented in type 'opus_uint32'
 fun:celt_udiv
