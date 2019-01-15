@@ -22,3 +22,8 @@ fun:ec_decode
 fun:ec_decode_bin
 
 src:*/celt/kiss_fft.c
+
+# Performance related
+fun:exp_rotation1
+fun:haar1
+fun:celt_preemphasis
