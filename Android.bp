@@ -1,6 +1,7 @@
 cc_library_shared {
     name: "libopus",
     vendor_available: true,
+    host_supported: true,
     vndk: {
         enabled: true,
     },
