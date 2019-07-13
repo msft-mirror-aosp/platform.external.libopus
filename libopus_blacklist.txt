@@ -23,6 +23,26 @@ fun:ec_decode_bin
 
 src:*/celt/kiss_fft.c
 
+# assembly optimizations that know what they are doing
+fun:silk_SMULWB_armv4
+fun:silk_SMULWT_armv4
+fun:silk_SMULWW_armv4
+fun:silk_SMLAWW_armv4
+#
+fun:silk_SMULWB_armv5e
+fun:silk_SMLAWB_armv5e
+fun:silk_SMULWT_armv5e
+fun:silk_SMLAWT_armv5e
+fun:silk_SMULBB_armv5e
+fun:silk_SMLABB_armv5e
+fun:silk_SMULBT_armv5e
+fun:silk_SMLABT_armv5e
+fun:silk_ADD_SAT32_armv5e
+fun:silk_SUB_SAT32_armv5e
+fun:silk_CLZ16_armv5
+fun:silk_CLZ32_armv5
+
+
 # Performance related
 fun:exp_rotation1
 fun:haar1
