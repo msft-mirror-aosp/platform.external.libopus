@@ -337,4 +337,10 @@ cc_library {
             },
         },
     },
+
+    target: {
+        darwin: {
+            enabled: false,
+        },
+    },
 }
