@@ -1,4 +1,4 @@
-cc_library_shared {
+cc_library {
     name: "libopus",
     vendor_available: true,
     host_supported: true,
