@@ -1,4 +1,4 @@
-cc_library_shared {
+cc_library {
     name: "libopus",
     vendor_available: true,
     host_supported: true,
@@ -335,6 +335,12 @@ cc_library_shared {
                     "-DOPUS_X86_PRESUME_SSE4_1",
                 ],
             },
+        },
+    },
+
+    target: {
+        darwin: {
+            enabled: false,
         },
     },
 }
