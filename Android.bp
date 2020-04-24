@@ -343,4 +343,8 @@ cc_library {
             enabled: false,
         },
     },
+    apex_available: [
+        "com.android.media.swcodec",
+    ],
+    min_sdk_version: "29",
 }
