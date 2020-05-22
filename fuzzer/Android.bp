@@ -29,6 +29,13 @@ cc_fuzz {
     srcs: [
         "opus_dec_fuzzer.cpp",
     ],
+
+    fuzz_config: {
+        cc: [
+            "android-media-fuzzing-reports@google.com",
+        ],
+        componentid: 155276,
+    },
 }
 
 cc_fuzz {
@@ -44,4 +51,11 @@ cc_fuzz {
     ],
 
     cflags: ["-DMULTISTREAM"],
+
+    fuzz_config: {
+        cc: [
+            "android-media-fuzzing-reports@google.com",
+        ],
+        componentid: 155276,
+    },
 }
