@@ -38,6 +38,7 @@ opus_demo
 repacketizer_demo
 stamp-h1
 test-driver
+trivial_example
 *.sw*
 *.o
 *.lo
@@ -83,3 +84,7 @@ silk/tests/test_unit_LPC_inv_pred_gain
 src/Debug
 src/Release
 src/x64
+/*[Bb]uild*/
+.vs/
+.vscode/
+CMakeSettings.json
