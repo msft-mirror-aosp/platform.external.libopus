@@ -55,6 +55,22 @@ set(OPUS_FLOAT_APPROX_HELP_STR "enable floating point approximations (Ensure you
 option(OPUS_FLOAT_APPROX ${OPUS_FLOAT_APPROX_HELP_STR} OFF)
 add_feature_info(OPUS_FLOAT_APPROX OPUS_FLOAT_APPROX ${OPUS_FLOAT_APPROX_HELP_STR})
 
+set(OPUS_ASSERTIONS_HELP_STR "additional software error checking.")
+option(OPUS_ASSERTIONS ${OPUS_ASSERTIONS_HELP_STR} OFF)
+add_feature_info(OPUS_ASSERTIONS OPUS_ASSERTIONS ${OPUS_ASSERTIONS_HELP_STR})
+
+set(OPUS_HARDENING_HELP_STR "run-time checks that are cheap and safe for use in production.")
+option(OPUS_HARDENING ${OPUS_HARDENING_HELP_STR} ON)
+add_feature_info(OPUS_HARDENING OPUS_HARDENING ${OPUS_HARDENING_HELP_STR})
+
+set(OPUS_FUZZING_HELP_STR "causes the encoder to make random decisions (do not use in production).")
+option(OPUS_FUZZING ${OPUS_FUZZING_HELP_STR} OFF)
+add_feature_info(OPUS_FUZZING OPUS_FUZZING ${OPUS_FUZZING_HELP_STR})
+
+set(OPUS_CHECK_ASM_HELP_STR "enable bit-exactness checks between optimized and c implementations.")
+option(OPUS_CHECK_ASM ${OPUS_CHECK_ASM_HELP_STR} OFF)
+add_feature_info(OPUS_CHECK_ASM OPUS_CHECK_ASM ${OPUS_CHECK_ASM_HELP_STR})
+
 set(OPUS_INSTALL_PKG_CONFIG_MODULE_HELP_STR "install pkg-config module.")
 option(OPUS_INSTALL_PKG_CONFIG_MODULE ${OPUS_INSTALL_PKG_CONFIG_MODULE_HELP_STR} ON)
 add_feature_info(OPUS_INSTALL_PKG_CONFIG_MODULE OPUS_INSTALL_PKG_CONFIG_MODULE ${OPUS_INSTALL_PKG_CONFIG_MODULE_HELP_STR})
@@ -68,6 +84,14 @@ if(APPLE)
   option(OPUS_BUILD_FRAMEWORK ${OPUS_BUILD_FRAMEWORK_HELP_STR} OFF)
   add_feature_info(OPUS_BUILD_FRAMEWORK OPUS_BUILD_FRAMEWORK ${OPUS_BUILD_FRAMEWORK_HELP_STR})
 endif()
+
+set(OPUS_FIXED_POINT_DEBUG_HELP_STR "debug fixed-point implementation.")
+cmake_dependent_option(OPUS_FIXED_POINT_DEBUG
+                      ${OPUS_FIXED_POINT_DEBUG_HELP_STR}
+                      ON
+                      "OPUS_FIXED_POINT; OPUS_FIXED_POINT_DEBUG"
+                      OFF)
+add_feature_info(OPUS_FIXED_POINT_DEBUG OPUS_FIXED_POINT_DEBUG ${OPUS_FIXED_POINT_DEBUG_HELP_STR})
 
 set(OPUS_VAR_ARRAYS_HELP_STR "use variable length arrays for stack arrays.")
 cmake_dependent_option(OPUS_VAR_ARRAYS
@@ -233,7 +257,7 @@ add_library(opus ${opus_headers} ${opus_sources} ${opus_sources_float} ${Opus_PU
 add_library(Opus::opus ALIAS opus)
 
 get_library_version(OPUS_LIBRARY_VERSION OPUS_LIBRARY_VERSION_MAJOR)
-message(STATUS "Opus library version: ${OPUS_LIBRARY_VERSION}")
+message(DEBUG "Opus library version: ${OPUS_LIBRARY_VERSION}")
 
 set_target_properties(opus
                       PROPERTIES SOVERSION
@@ -254,7 +278,11 @@ target_include_directories(
           silk)
 
 target_link_libraries(opus PRIVATE ${OPUS_REQUIRED_LIBRARIES})
-target_compile_definitions(opus PRIVATE OPUS_BUILD ENABLE_HARDENING)
+target_compile_definitions(opus PRIVATE OPUS_BUILD)
+
+if(OPUS_FIXED_POINT_DEBUG)
+  target_compile_definitions(opus PRIVATE FIXED_DEBUG)
+endif()
 
 if(OPUS_FORTIFY_SOURCE AND NOT MSVC)
   target_compile_definitions(opus PRIVATE
@@ -263,6 +291,22 @@ endif()
 
 if(OPUS_FLOAT_APPROX)
   target_compile_definitions(opus PRIVATE FLOAT_APPROX)
+endif()
+
+if(OPUS_ASSERTIONS)
+  target_compile_definitions(opus PRIVATE ENABLE_ASSERTIONS)
+endif()
+
+if(OPUS_HARDENING)
+  target_compile_definitions(opus PRIVATE ENABLE_HARDENING)
+endif()
+
+if(OPUS_FUZZING)
+  target_compile_definitions(opus PRIVATE FUZZING)
+endif()
+
+if(OPUS_CHECK_ASM)
+  target_compile_definitions(opus PRIVATE OPUS_CHECK_ASM)
 endif()
 
 if(OPUS_VAR_ARRAYS)
@@ -546,13 +590,13 @@ if(BUILD_TESTING)
   if(OPUS_FIXED_POINT)
     target_compile_definitions(test_opus_decode PRIVATE DISABLE_FLOAT_API)
   endif()
-  add_test(test_opus_decode test_opus_decode)
+  add_test(NAME test_opus_decode COMMAND $<TARGET_FILE:test_opus_decode> WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
   add_executable(test_opus_padding ${test_opus_padding_sources})
   target_include_directories(test_opus_padding
                              PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
   target_link_libraries(test_opus_padding PRIVATE opus)
-  add_test(test_opus_padding test_opus_padding)
+  add_test(NAME test_opus_padding COMMAND $<TARGET_FILE:test_opus_padding> WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
   if(NOT BUILD_SHARED_LIBS)
     # disable tests that depends on private API when building shared lib
@@ -563,12 +607,12 @@ if(BUILD_TESTING)
     if(OPUS_FIXED_POINT)
       target_compile_definitions(test_opus_api PRIVATE DISABLE_FLOAT_API)
     endif()
-    add_test(test_opus_api test_opus_api)
+    add_test(NAME test_opus_api COMMAND $<TARGET_FILE:test_opus_api> WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 
     add_executable(test_opus_encode ${test_opus_encode_sources})
     target_include_directories(test_opus_encode
                                PRIVATE ${CMAKE_CURRENT_BINARY_DIR} celt)
     target_link_libraries(test_opus_encode PRIVATE opus)
-    add_test(test_opus_encode test_opus_encode)
+    add_test(NAME test_opus_encode COMMAND $<TARGET_FILE:test_opus_encode> WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
   endif()
 endif()
