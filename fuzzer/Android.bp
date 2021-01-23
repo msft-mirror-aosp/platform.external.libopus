@@ -18,16 +18,12 @@
  * Originally developed and contributed by Ittiam Systems Pvt. Ltd, Bangalore
  */
 
-cc_fuzz {
-    name: "opus_dec_fuzzer",
-    host_supported:true,
+cc_defaults {
+    name: "opus_fuzz_defaults",
+    host_supported: true,
 
     static_libs: [
         "libopus",
-    ],
-
-    srcs: [
-        "opus_dec_fuzzer.cpp",
     ],
 
     fuzz_config: {
@@ -39,23 +35,57 @@ cc_fuzz {
 }
 
 cc_fuzz {
-    name: "opus_multistream_dec_fuzzer",
-    host_supported:true,
-
-    static_libs: [
-        "libopus",
-    ],
+    name: "opus_dec_fuzzer",
 
     srcs: [
         "opus_dec_fuzzer.cpp",
     ],
 
-    cflags: ["-DMULTISTREAM"],
+    defaults: [
+        "opus_fuzz_defaults",
+    ],
+}
 
-    fuzz_config: {
-        cc: [
-            "android-media-fuzzing-reports@google.com",
-        ],
-        componentid: 155276,
-    },
+cc_fuzz {
+    name: "opus_multistream_dec_fuzzer",
+
+    srcs: [
+        "opus_dec_fuzzer.cpp",
+    ],
+
+    cflags: [
+        "-DMULTISTREAM",
+    ],
+
+    defaults: [
+        "opus_fuzz_defaults",
+    ],
+}
+
+cc_fuzz {
+    name: "opus_enc_fuzzer",
+
+    srcs: [
+        "opus_enc_fuzzer.cpp",
+    ],
+
+    defaults: [
+        "opus_fuzz_defaults"
+    ],
+}
+
+cc_fuzz {
+    name: "opus_multistream_enc_fuzzer",
+
+    srcs: [
+        "opus_enc_fuzzer.cpp",
+    ],
+
+    defaults: [
+        "opus_fuzz_defaults"
+    ],
+
+    cflags: [
+        "-DMULTISTREAM",
+    ],
 }
