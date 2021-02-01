@@ -5,11 +5,11 @@ third_party {
     type: GIT
     value: "https://gitlab.xiph.org/xiph/opus.git"
   }
-  version: "b83dd52868326a401c8578041e3dbea439d53f11"
+  version: "794392ecd77e6fc6aafa62c3f6002780abcc2c7c"
   license_type: NOTICE
   last_upgrade_date {
-    year: 2020
-    month: 9
-    day: 30
+    year: 2021
+    month: 1
+    day: 5
   }
 }
