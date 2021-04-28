@@ -20,6 +20,10 @@ fun:ec_dec_init
 fun:ec_decode
 # celt/entdec.c:150
 fun:ec_decode_bin
+# silk/NSQ_del_dec.c:537:38: -242159836 - 2132528648 cannot be represented in type 'int'
+fun:silk_noise_shape_quantizer_del_dec
+# silk/NSQ.c:265:25: 1318152552 + 1068143768 cannot be represented in type 'int'
+fun:silk_noise_shape_quantizer
 
 src:*/celt/kiss_fft.c
 
