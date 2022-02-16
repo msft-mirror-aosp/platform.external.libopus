@@ -12,7 +12,4 @@ third_party {
     month: 2
     day: 5
   }
-  security {
-    tag: "NVD-CPE2.3:cpe:/a:opus-codec:opus:1.0.3"
-  }
 }
