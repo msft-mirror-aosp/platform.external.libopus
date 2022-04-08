@@ -1,5 +1,4 @@
-CELT_SOURCES = \
-celt/bands.c \
+CELT_SOURCES = celt/bands.c \
 celt/celt.c \
 celt/celt_encoder.c \
 celt/celt_decoder.c \

@@ -1249,7 +1249,7 @@ int opus_multistream_encoder_ctl_va_list(OpusMSEncoder *st, int request,
       OpusEncoder **value;
       stream_id = va_arg(ap, opus_int32);
       if (stream_id<0 || stream_id >= st->layout.nb_streams)
-         goto bad_arg;
+         ret = OPUS_BAD_ARG;
       value = va_arg(ap, OpusEncoder**);
       if (!value)
       {
