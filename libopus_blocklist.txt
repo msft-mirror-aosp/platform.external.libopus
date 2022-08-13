@@ -24,6 +24,8 @@ fun:ec_decode_bin
 fun:silk_noise_shape_quantizer_del_dec
 # silk/NSQ.c:265:25: 1318152552 + 1068143768 cannot be represented in type 'int'
 fun:silk_noise_shape_quantizer
+# silk/x86/NSQ_del_dec_sse4_1.c:571:28: 1162446838 - -1165932966 cannot be represented in type 'int'
+fun:silk_noise_shape_quantizer_del_dec_sse4_1
 
 src:*/celt/kiss_fft.c
 
