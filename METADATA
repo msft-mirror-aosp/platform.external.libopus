@@ -9,14 +9,14 @@ third_party {
     type: GIT
     value: "https://gitlab.xiph.org/xiph/opus.git"
   }
-  version: "8cf872a186b96085b1bb3a547afd598354ebeb87"
+  version: "v1.4"
   license_type: NOTICE
   security {
     tag: "NVD-CPE2.3:cpe:/a:opus-codec:opus:1.0.3"
   }
   last_upgrade_date {
     year: 2023
-    month: 1
-    day: 18
+    month: 4
+    day: 21
   }
 }
