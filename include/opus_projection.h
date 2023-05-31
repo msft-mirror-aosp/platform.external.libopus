@@ -412,7 +412,7 @@ OPUS_EXPORT OPUS_WARN_UNUSED_RESULT OpusProjectionDecoder *opus_projection_decod
   * malloc.
   * To reset a previously initialized state, use the #OPUS_RESET_STATE CTL.
   * @see opus_projection_decoder_create
-  * @see opus_projection_deocder_get_size
+  * @see opus_projection_decoder_get_size
   * @param st <tt>OpusProjectionDecoder*</tt>: Projection encoder state to initialize.
   * @param Fs <tt>opus_int32</tt>: Sampling rate to decode at (in Hz).
   *                                This must be one of 8000, 12000, 16000,
