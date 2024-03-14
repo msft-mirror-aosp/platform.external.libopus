@@ -190,7 +190,7 @@ cc_library {
         "src/opus_projection_encoder.c",
         "src/opus_projection_decoder.c",
         "src/repacketizer.c",
-
+        "src/extensions.c",
         // OPUS_SOURCES_FLOAT
         "src/analysis.c",
         "src/mlp.c",
