@@ -190,7 +190,7 @@ cc_library {
         "src/opus_projection_encoder.c",
         "src/opus_projection_decoder.c",
         "src/repacketizer.c",
-
+        "src/extensions.c",
         // OPUS_SOURCES_FLOAT
         "src/analysis.c",
         "src/mlp.c",
@@ -231,14 +231,25 @@ cc_library {
                 "celt/arm/armcpu.c",
                 "celt/arm/arm_celt_map.c",
 
-                // DSP, MEDIA and NEON instructions are in the same assembler
-                // file - thus we need to include it even if NEON is not
-                // supported on target platform.
                 // CELT_SOURCES_ARM_ASM
                 "celt/arm/celt_pitch_xcorr_arm_gnu.s",
 
                 // CELT_AM_SOURCES_ARM_ASM
                 "celt/arm/armopts_gnu.s",
+
+                // CELT_SOURCES_ARM_NEON_INTR
+                "celt/arm/celt_neon_intr.c",
+                "celt/arm/pitch_neon_intr.c",
+
+                // SILK_SOURCES_ARM_NEON_INTR,
+                "silk/arm/arm_silk_map.c",
+                "silk/arm/biquad_alt_neon_intr.c",
+                "silk/arm/LPC_inv_pred_gain_neon_intr.c",
+                "silk/arm/NSQ_del_dec_neon_intr.c",
+                "silk/arm/NSQ_neon.c",
+
+                // SILK_SOURCES_FIXED_ARM_NEON_INTR,
+                "silk/fixed/arm/warped_autocorrelation_FIX_neon_intr.c",
             ],
 
             cflags: [
@@ -249,37 +260,15 @@ cc_library {
                 "-DOPUS_ARM_MAY_HAVE_MEDIA",
                 "-DOPUS_ARM_INLINE_MEDIA",
                 "-DOPUS_ARM_MAY_HAVE_NEON",
+                "-DOPUS_ARM_MAY_HAVE_NEON_INTR",
+                "-DOPUS_ARM_PRESUME_NEON",
+                "-DOPUS_ARM_INLINE_NEON",
                 "-DOPUS_HAVE_RTCD",
             ],
+        },
 
-            // Note: OPUS enhanced DSP/NEON implementation is not yet
-            // compatible with arm64.  Only add the appropriate defines for
-            // 32-bit arm architecture.
-            neon: {
-                srcs: [
-                    // CELT_SOURCES_ARM_NEON_INTR
-                    "celt/arm/celt_neon_intr.c",
-                    "celt/arm/pitch_neon_intr.c",
-
-                    // SILK_SOURCES_ARM_NEON_INTR,
-                    "silk/arm/arm_silk_map.c",
-                    "silk/arm/biquad_alt_neon_intr.c",
-                    "silk/arm/LPC_inv_pred_gain_neon_intr.c",
-                    "silk/arm/NSQ_del_dec_neon_intr.c",
-                    "silk/arm/NSQ_neon.c",
-
-                    // SILK_SOURCES_FIXED_ARM_NEON_INTR,
-                    "silk/fixed/arm/warped_autocorrelation_FIX_neon_intr.c",
-                ],
-
-                cflags: [
-                    "-DOPUS_ARM_MAY_HAVE_NEON",
-                    "-DOPUS_ARM_MAY_HAVE_NEON_INTR",
-                    "-DOPUS_ARM_PRESUME_NEON",
-                    "-DOPUS_ARM_INLINE_NEON",
-                ],
-            },
-
+        arm64: {
+            // TODO: opus 1.5 has support for arm64 (AARCH64) too.
         },
 
         x86: {
