@@ -54,7 +54,7 @@ f'''
 #ifndef USE_WEIGHTS_FILE
 '''
         )
-        writer.weight_arrays.append(name)
+    writer.weight_arrays.append(name)
 
     if reshape_8x4:
         vector = vector.reshape((vector.shape[0]//4, 4, vector.shape[1]//8, 8))
@@ -64,8 +64,7 @@ f'''
 
     if debug_float:
         f.write('#ifndef DISABLE_DEBUG_FLOAT\n')
-    if binary_blob:
-        f.write(
+    f.write(
 f'''
 #define WEIGHTS_{name}_DEFINED
 #define WEIGHTS_{name}_TYPE WEIGHT_TYPE_{dtype_suffix[dtype]}
