@@ -223,6 +223,11 @@ tests_test_opus_padding_LDADD = libopus.la $(NE10_LIBS) $(LIBM)
 tests_test_opus_dred_SOURCES = tests/test_opus_dred.c tests/test_opus_common.h
 tests_test_opus_dred_LDADD = libopus.la $(NE10_LIBS) $(LIBM)
 
+if CUSTOM_MODES
+tests_test_opus_custom_SOURCES = tests/test_opus_custom.c tests/test_opus_common.h
+tests_test_opus_custom_LDADD = libopus.la $(NE10_LIBS) $(LIBM)
+endif
+
 CELT_OBJ = $(CELT_SOURCES:.c=.lo)
 SILK_OBJ = $(SILK_SOURCES:.c=.lo)
 LPCNET_OBJ = $(LPCNET_SOURCES:.c=.lo)
@@ -289,14 +294,17 @@ if EXTRA_PROGRAMS
 noinst_PROGRAMS += opus_custom_demo
 opus_custom_demo_SOURCES = celt/opus_custom_demo.c
 opus_custom_demo_LDADD = libopus.la $(LIBM)
+
+TESTS += tests/test_opus_custom
+noinst_PROGRAMS += tests/test_opus_custom
 endif
 endif
 
 if EXTRA_PROGRAMS
 if ENABLE_DEEP_PLC
-noinst_PROGRAMS += lpcnet_demo dump_data dump_weights_blob
-lpcnet_demo_SOURCES = dnn/lpcnet_demo.c
-lpcnet_demo_LDADD = $(LPCNET_OBJ) $(CELT_OBJ) $(LIBM)
+noinst_PROGRAMS += fargan_demo dump_data dump_weights_blob
+fargan_demo_SOURCES = dnn/fargan_demo.c
+fargan_demo_LDADD = $(LPCNET_OBJ) $(CELT_OBJ) $(LIBM)
 
 dump_data_SOURCES = dnn/dump_data.c
 dump_data_LDADD = $(LPCNET_OBJ) $(CELT_OBJ) $(LIBM)
@@ -331,6 +339,7 @@ EXTRA_DIST = opus.pc.in \
              cmake/OpusFunctions.cmake \
              cmake/OpusPackageVersion.cmake \
              cmake/OpusSources.cmake \
+             cmake/README.md \
              cmake/RunTest.cmake \
              cmake/config.h.cmake.in \
              cmake/vla.c \
@@ -338,11 +347,14 @@ EXTRA_DIST = opus.pc.in \
              cmake/cpu_info_by_c.c \
              meson/get-version.py \
              meson/read-sources-list.py \
+             meson/README.md \
              meson.build \
              meson_options.txt \
              include/meson.build \
              celt/meson.build \
              celt/tests/meson.build \
+             dnn/meson.build \
+             dnn/README.md \
              silk/meson.build \
              silk/tests/meson.build \
              src/meson.build \
