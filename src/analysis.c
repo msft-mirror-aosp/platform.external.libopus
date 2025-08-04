@@ -149,16 +149,22 @@ static opus_val32 silk_resampler_down2_hp(
         out32_hp  = ADD32( out32_hp, X );
         S[ 2 ] = ADD32( -in32, X );
 
-        if(__builtin_add_overflow(hp_ener, out32_hp*(opus_val64)out32_hp, &hp_ener))
+        /* len2 can be up to 480, so we shift by 8 to make it fit. */
+#ifdef FIXED_POINT
+        if(__builtin_add_overflow(hp_ener, SHR64(out32_hp*(opus_val64)out32_hp, 8), &hp_ener))
         {
-           hp_ener = UINT64_MAX;
+           hp_ener = INT64_MAX;
         }
+#else
+        hp_ener += SHR64(out32_hp*(opus_val64)out32_hp, 8);
+#endif
         /* Add, convert back to int16 and store to output */
         out[ k ] = HALF32(out32);
     }
 #ifdef FIXED_POINT
-    /* len2 can be up to 480, so we shift by 8 more to make it fit. */
-    hp_ener = hp_ener >> (2*SIG_SHIFT + 8);
+    /* Fitting in 32 bits. */
+    hp_ener = hp_ener >> (2*SIG_SHIFT);
+    if (hp_ener > INT32_MAX) hp_ener = INT32_MAX;
 #endif
     return (opus_val32)hp_ener;
 }

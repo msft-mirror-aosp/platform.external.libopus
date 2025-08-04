@@ -457,7 +457,9 @@ static void dc_reject(const opus_res *in, opus_int32 cutoff_Hz, opus_res *out, o
       for (i=0;i<len;i++)
       {
          opus_val32 x, y;
-         x = SHL32((opus_val32)in[channels*i+c], 14-RES_SHIFT);
+         /* Saturate at +6 dBFS to avoid any wrap-around. */
+         x = SATURATE((opus_val32)in[channels*i+c], (1<<16<<RES_SHIFT)-1);
+         x = SHL32(x, 14-RES_SHIFT);
          y = x-hp_mem[2*c];
          hp_mem[2*c] = hp_mem[2*c] + PSHR32(x - hp_mem[2*c], shift);
 #ifdef ENABLE_RES24
@@ -1151,7 +1153,8 @@ opus_int32 opus_encode_native(OpusEncoder *st, const opus_res *pcm, int frame_si
 #endif
     ALLOC_STACK;
 
-    max_data_bytes = IMIN(1276, out_data_bytes);
+    /* Just avoid insane packet sizes here, but the real bounds are applied later on. */
+    max_data_bytes = IMIN(1276*6, out_data_bytes);
 
     st->rangeFinal = 0;
     if (frame_size <= 0 || max_data_bytes <= 0)
@@ -1265,7 +1268,7 @@ opus_int32 opus_encode_native(OpusEncoder *st, const opus_res *pcm, int frame_si
     st->bitrate_bps -= dred_bitrate_bps;
 #endif
     if (max_data_bytes<3 || st->bitrate_bps < 3*frame_rate*8
-       || (frame_rate<50 && (max_data_bytes*frame_rate<300 || st->bitrate_bps < 2400)))
+       || (frame_rate<50 && (max_data_bytes*(opus_int32)frame_rate<300 || st->bitrate_bps < 2400)))
     {
        /*If the space is too low to do something useful, emit 'PLC' frames.*/
        int tocmode = st->mode;
@@ -1761,7 +1764,7 @@ opus_int32 opus_encode_native(OpusEncoder *st, const opus_res *pcm, int frame_si
 }
 
 static opus_int32 opus_encode_frame_native(OpusEncoder *st, const opus_res *pcm, int frame_size,
-                unsigned char *data, opus_int32 max_data_bytes,
+                unsigned char *data, opus_int32 orig_max_data_bytes,
                 int float_api, int first_frame,
 #ifdef ENABLE_DRED
                 opus_int32 dred_bitrate_bps,
@@ -1777,6 +1780,7 @@ static opus_int32 opus_encode_frame_native(OpusEncoder *st, const opus_res *pcm,
     const CELTMode *celt_mode;
     int i;
     int ret=0;
+    int max_data_bytes;
     opus_int32 nBytes;
     ec_enc enc;
     int bytes_target;
@@ -1797,6 +1801,7 @@ static opus_int32 opus_encode_frame_native(OpusEncoder *st, const opus_res *pcm,
     VARDECL(opus_res, tmp_prefill);
     SAVE_STACK;
 
+    max_data_bytes = IMIN(orig_max_data_bytes, 1276);
     st->rangeFinal = 0;
     silk_enc = (char*)st+st->silk_enc_offset;
     celt_enc = (CELTEncoder*)((char*)st+st->celt_enc_offset);
@@ -2497,12 +2502,12 @@ static opus_int32 opus_encode_frame_native(OpusEncoder *st, const opus_res *pcm,
 #endif
     if (apply_padding)
     {
-       if (opus_packet_pad(data, ret, max_data_bytes) != OPUS_OK)
+       if (opus_packet_pad(data, ret, orig_max_data_bytes) != OPUS_OK)
        {
           RESTORE_STACK;
           return OPUS_INTERNAL_ERROR;
        }
-       ret = max_data_bytes;
+       ret = orig_max_data_bytes;
     }
     RESTORE_STACK;
     return ret;

@@ -103,6 +103,8 @@ void celt_fatal(const char *str, const char *file, int line)
 #define MAX32(a,b) ((a) > (b) ? (a) : (b))   /**< Maximum 32-bit value.   */
 #define IMIN(a,b) ((a) < (b) ? (a) : (b))   /**< Minimum int value.   */
 #define IMAX(a,b) ((a) > (b) ? (a) : (b))   /**< Maximum int value.   */
+#define FMIN(a,b) ((a) < (b) ? (a) : (b))   /**< Minimum float value.   */
+#define FMAX(a,b) ((a) > (b) ? (a) : (b))   /**< Maximum float value.   */
 #define UADD32(a,b) ((a)+(b))
 #define USUB32(a,b) ((a)-(b))
 #define MAXG(a,b) MAX32(a, b)
@@ -182,7 +184,7 @@ typedef opus_val16 opus_res;
 #ifdef ENABLE_QEXT
 typedef opus_val32 celt_coef;
 #define COEF_ONE Q31ONE
-#define MULT_COEF_32(a, b) MULT32_32_Q31(a,b)
+#define MULT_COEF_32(a, b) MULT32_32_P31(a,b)
 #define MAC_COEF_32_ARM(c, a, b) ADD32((c), MULT32_32_Q32(a,b))
 #define MULT_COEF(a, b) MULT32_32_Q31(a,b)
 #define MULT_COEF_TAPS(a, b) SHL32(MULT16_16(a,b), 1)
@@ -313,6 +315,8 @@ static OPUS_INLINE int celt_isnan(float x)
 #define PSHR32(a,shift) (a)
 #define VSHR32(a,shift) (a)
 
+#define SHR64(a,shift) (a)
+
 #define PSHR(a,shift)   (a)
 #define SHR(a,shift)    (a)
 #define SHL(a,shift)    (a)
@@ -330,6 +334,9 @@ static OPUS_INLINE int celt_isnan(float x)
 #define SUB32(a,b) ((a)-(b))
 #define ADD32_ovflw(a,b) ((a)+(b))
 #define SUB32_ovflw(a,b) ((a)-(b))
+#define SHL32_ovflw(a,shift) (a)
+#define PSHR32_ovflw(a,shift) (a)
+
 #define MULT16_16_16(a,b)     ((a)*(b))
 #define MULT16_16(a,b)     ((opus_val32)(a)*(opus_val32)(b))
 #define MAC16_16(c,a,b)     ((c)+(opus_val32)(a)*(opus_val32)(b))
@@ -337,7 +344,9 @@ static OPUS_INLINE int celt_isnan(float x)
 #define MULT16_32_Q15(a,b)     ((a)*(b))
 #define MULT16_32_Q16(a,b)     ((a)*(b))
 
+#define MULT32_32_Q16(a,b)     ((a)*(b))
 #define MULT32_32_Q31(a,b)     ((a)*(b))
+#define MULT32_32_P31(a,b)     ((a)*(b))
 
 #define MAC16_32_Q15(c,a,b)     ((c)+(a)*(b))
 #define MAC16_32_Q16(c,a,b)     ((c)+(a)*(b))
