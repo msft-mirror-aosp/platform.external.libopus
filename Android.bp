@@ -376,3 +376,22 @@ cc_library {
     ],
     min_sdk_version: "29",
 }
+
+cc_binary {
+    name: "opus_demo",
+    host_supported: true,
+
+    local_include_dirs: [
+        "silk",
+        "celt",
+    ],
+
+    sanitize: {
+        integer_overflow: true,
+        misc_undefined: ["bounds"],
+    },
+
+    srcs: ["src/opus_demo.c"],
+
+    static_libs: ["libopus"],
+}
