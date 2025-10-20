@@ -268,7 +268,34 @@ cc_library {
         },
 
         arm64: {
-            // TODO: opus 1.5 has support for arm64 (AARCH64) too.
+            srcs: [
+                // CELT_SOURCES_ARM
+                "celt/arm/armcpu.c",
+                "celt/arm/arm_celt_map.c",
+
+                // CELT_SOURCES_ARM_NEON_INTR
+                "celt/arm/celt_neon_intr.c",
+                "celt/arm/pitch_neon_intr.c",
+
+                // SILK_SOURCES_ARM_NEON_INTR,
+                "silk/arm/arm_silk_map.c",
+                "silk/arm/biquad_alt_neon_intr.c",
+                "silk/arm/LPC_inv_pred_gain_neon_intr.c",
+                "silk/arm/NSQ_del_dec_neon_intr.c",
+                "silk/arm/NSQ_neon.c",
+
+                // SILK_SOURCES_FIXED_ARM_NEON_INTR,
+                "silk/fixed/arm/warped_autocorrelation_FIX_neon_intr.c",
+            ],
+
+            cflags: [
+                "-DOPUS_ARM_MAY_HAVE_NEON_INTR",
+                "-DOPUS_ARM_PRESUME_AARCH64_NEON_INTR",
+                "-DOPUS_ARM_MAY_HAVE_AARCH64_NEON_INTR",
+                "-DOPUS_ARM_MAY_HAVE_DOTPROD",
+                "-DOPUS_ARM_PRESUME_DOTPROD",
+                "-DOPUS_HAVE_RTCD",
+            ],
         },
 
         x86: {
@@ -375,4 +402,23 @@ cc_library {
         "com.android.bt",
     ],
     min_sdk_version: "29",
+}
+
+cc_binary {
+    name: "opus_demo",
+    host_supported: true,
+
+    local_include_dirs: [
+        "silk",
+        "celt",
+    ],
+
+    sanitize: {
+        integer_overflow: true,
+        misc_undefined: ["bounds"],
+    },
+
+    srcs: ["src/opus_demo.c"],
+
+    static_libs: ["libopus"],
 }
