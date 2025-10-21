@@ -11,12 +11,12 @@ third_party {
   }
   last_upgrade_date {
     year: 2025
-    month: 4
-    day: 25
+    month: 8
+    day: 4
   }
   identifier {
     type: "Git"
     value: "https://gitlab.xiph.org/xiph/opus.git"
-    version: "55513e81d8f606bd75d0ff773d2144e5f2a732f5"
+    version: "f92fdda4f9b75ecb5f0f38b86c991195585579ea"
   }
 }
