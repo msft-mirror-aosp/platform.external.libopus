@@ -2,7 +2,7 @@ dnn/models/lace_v2.pth
 dnn/models/nolace_v2.pth
 dnn/models/nolace_192_v2.pth
 dnn/models/nolace_160_v2.pth
-dnn/models/fargan48bbr_adv_50.pth
+dnn/models/fargan_sq1Ab_adv_50.pth
 dnn/models/rdovae_sparse5m_32.pth
 dnn/models/plc4ar_16.pth
 dnn/models/pitch_vsmallconv1.pth
@@ -26,3 +26,6 @@ dnn/dred_rdovae_enc_data.c
 dnn/dred_rdovae_dec_data.c
 dnn/lossgen_data.c
 dnn/lossgen_data.h
+dnn/models/bbwenet_v1.pth
+dnn/bbwenet_data.h
+dnn/bbwenet_data.c

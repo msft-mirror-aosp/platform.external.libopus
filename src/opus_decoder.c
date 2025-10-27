@@ -1,4 +1,5 @@
 /* Copyright (c) 2010 Xiph.Org Foundation, Skype Limited
+   Copyright (c) 2024 Arm Limited
    Written by Jean-Marc Valin and Koen Vos */
 /*
    Redistribution and use in source and binary forms, with or without
@@ -434,6 +435,21 @@ static int opus_decode_frame(OpusDecoder *st, const unsigned char *data,
 #ifndef DISABLE_NOLACE
      if (st->complexity >= 7) {st->DecControl.osce_method = OSCE_METHOD_NOLACE;}
 #endif
+#ifdef ENABLE_OSCE_BWE
+     if (st->complexity >= 4 && st->DecControl.enable_osce_bwe &&
+         st->Fs == 48000 && st->DecControl.internalSampleRate == 16000 &&
+         ((mode == MODE_SILK_ONLY) || (data == NULL))) {
+         /* request WB -> FB signal extension */
+         st->DecControl.osce_extended_mode = OSCE_MODE_SILK_BBWE;
+     } else {
+         /* at this point, mode can only be MODE_SILK_ONLY or MODE_HYBRID */
+         st->DecControl.osce_extended_mode = mode == MODE_SILK_ONLY ? OSCE_MODE_SILK_ONLY : OSCE_MODE_HYBRID;
+     }
+     if (st->prev_mode == MODE_CELT_ONLY) {
+         /* Update extended mode for CELT->SILK transition */
+         st->DecControl.prev_osce_extended_mode = OSCE_MODE_CELT_ONLY;
+     }
+#endif
 #endif
 
      lost_flag = data == NULL ? 1 : 2 * !!decode_fec;
@@ -562,7 +578,11 @@ static int opus_decode_frame(OpusDecoder *st, const unsigned char *data,
    /* MUST be after PLC */
    MUST_SUCCEED(celt_decoder_ctl(celt_dec, CELT_SET_START_BAND(start_band)));
 
+#ifdef ENABLE_OSCE_BWE
+   if (mode != MODE_SILK_ONLY && st->DecControl.osce_extended_mode != OSCE_MODE_SILK_BBWE)
+#else
    if (mode != MODE_SILK_ONLY)
+#endif
    {
       int celt_frame_size = IMIN(F20, frame_size);
       /* Make sure to discard any previous CELT state */
@@ -649,7 +669,11 @@ static int opus_decode_frame(OpusDecoder *st, const unsigned char *data,
       for (i=0;i<frame_size*st->channels;i++)
       {
          opus_val32 x;
+#ifdef ENABLE_RES24
+         x = MULT32_32_Q16(pcm[i],gain);
+#else
          x = MULT16_32_P16(pcm[i],gain);
+#endif
          pcm[i] = SATURATE(x, 32767);
       }
    }
@@ -809,7 +833,7 @@ int opus_decode_native(OpusDecoder *st, const unsigned char *data,
       OPUS_PRINT_INT(nb_samples);
 #ifndef FIXED_POINT
    if (soft_clip)
-      opus_pcm_soft_clip(pcm, nb_samples, st->channels, st->softclip_mem);
+      opus_pcm_soft_clip_impl(pcm, nb_samples, st->channels, st->softclip_mem, st->arch);
    else
       st->softclip_mem[0]=st->softclip_mem[1]=0;
 #endif
@@ -835,7 +859,7 @@ int opus_decode(OpusDecoder *st, const unsigned char *data,
       opus_int32 len, opus_int16 *pcm, int frame_size, int decode_fec)
 {
        VARDECL(opus_res, out);
-       int ret, i;
+       int ret;
        int nb_samples;
        ALLOC_STACK;
 
@@ -858,8 +882,13 @@ int opus_decode(OpusDecoder *st, const unsigned char *data,
        ret = opus_decode_native(st, data, len, out, frame_size, decode_fec, 0, NULL, OPTIONAL_CLIP, NULL, 0);
        if (ret > 0)
        {
+# if defined(FIXED_POINT)
+          int i;
           for (i=0;i<ret*st->channels;i++)
              pcm[i] = RES2INT16(out[i]);
+# else
+          celt_float2int16(out, pcm, ret*st->channels, st->arch);
+# endif
        }
        RESTORE_STACK;
        return ret;
@@ -1006,6 +1035,28 @@ int opus_decoder_ctl(OpusDecoder *st, int request, ...)
        *value = st->complexity;
    }
    break;
+#ifdef ENABLE_OSCE_BWE
+   case OPUS_SET_OSCE_BWE_REQUEST:
+   {
+       opus_int32 value = va_arg(ap, opus_int32);
+       if(value<0 || value>1)
+       {          goto bad_arg;
+       }
+       st->DecControl.enable_osce_bwe = value;
+
+      }
+   break;
+   case OPUS_GET_OSCE_BWE_REQUEST:
+   {
+       opus_int32 *value = va_arg(ap, opus_int32*);
+       if (!value)
+       {
+          goto bad_arg;
+       }
+       *value = st->DecControl.enable_osce_bwe;
+   }
+   break;
+#endif
    case OPUS_GET_FINAL_RANGE_REQUEST:
    {
       opus_uint32 *value = va_arg(ap, opus_uint32*);
