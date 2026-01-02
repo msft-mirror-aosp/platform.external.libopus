@@ -19,6 +19,8 @@
  */
 
 #include <algorithm>
+#include <array>
+#include <cstdlib>
 
 #include "opus.h"
 
