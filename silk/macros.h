@@ -123,7 +123,7 @@ static OPUS_INLINE opus_int32 silk_SUB_SAT32(opus_int32 a, opus_int32 b) {
     return c;
 }
 
-#if defined(MIPSr1_ASM)
+#if defined(FIXED_POINT) && defined(__mips)
 #include "mips/macros_mipsr1.h"
 #endif
 

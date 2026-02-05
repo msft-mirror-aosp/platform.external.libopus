@@ -3,14 +3,14 @@ name: CMake
 on: [push, pull_request]
 
 env:
-  NDK_VERSION: 27.2.12479018
+  NDK_VERSION: 27.3.13750724
 
 jobs:
   CMakeVersionTest:
     name: Test build with CMake 3.16.0
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Download models
@@ -40,7 +40,7 @@ jobs:
     name: CMake MINGW
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Download models
@@ -228,7 +228,7 @@ jobs:
           }
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Install AutoConf, AutoMake and LibTool # Needed for autogen.sh
