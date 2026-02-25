@@ -10,13 +10,13 @@ third_party {
     tag: "NVD-CPE2.3:cpe:/a:opus-codec:opus:1.0.3"
   }
   last_upgrade_date {
-    year: 2025
-    month: 8
-    day: 4
+    year: 2026
+    month: 2
+    day: 5
   }
   identifier {
     type: "Git"
     value: "https://gitlab.xiph.org/xiph/opus.git"
-    version: "f92fdda4f9b75ecb5f0f38b86c991195585579ea"
+    version: "475cbc5d0d13ac81d66f4ba884a7fa0702521b06"
   }
 }

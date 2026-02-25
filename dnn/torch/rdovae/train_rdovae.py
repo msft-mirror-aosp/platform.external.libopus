@@ -33,7 +33,7 @@ import argparse
 import torch
 import tqdm
 
-from rdovae import RDOVAE, RDOVAEDataset, distortion_loss, hard_rate_estimate, soft_rate_estimate
+from rdovae import RDOVAE, RDOVAEDataset, dist_func, hard_rate_estimate, soft_rate_estimate, IDCT
 
 
 parser = argparse.ArgumentParser()
@@ -48,7 +48,7 @@ model_group = parser.add_argument_group(title="model parameters")
 model_group.add_argument('--latent-dim', type=int, help="number of symbols produces by encoder, default: 80", default=80)
 model_group.add_argument('--cond-size', type=int, help="first conditioning size, default: 256", default=256)
 model_group.add_argument('--cond-size2', type=int, help="second conditioning size, default: 256", default=256)
-model_group.add_argument('--state-dim', type=int, help="dimensionality of transfered state, default: 24", default=24)
+model_group.add_argument('--state-dim', type=int, help="dimensionality of transferred state, default: 24", default=24)
 model_group.add_argument('--quant-levels', type=int, help="number of quantization levels, default: 16", default=16)
 model_group.add_argument('--lambda-min', type=float, help="minimal value for rate lambda, default: 0.0002", default=2e-4)
 model_group.add_argument('--lambda-max', type=float, help="maximal value for rate lambda, default: 0.0104", default=0.0104)
@@ -119,9 +119,11 @@ num_features = 20
 # training data
 feature_file = args.features
 
+adapt = type(args.initial_checkpoint) != type(None)
+
 # model
 checkpoint['model_args']    = (num_features, latent_dim, quant_levels, cond_size, cond_size2)
-checkpoint['model_kwargs']  = {'state_dim': state_dim, 'split_mode' : split_mode, 'pvq_num_pulses': args.pvq_num_pulses, 'state_dropout_rate': args.state_dropout_rate, 'softquant': softquant, 'chunks_per_offset': args.chunks_per_offset}
+checkpoint['model_kwargs']  = {'state_dim': state_dim, 'split_mode' : split_mode, 'pvq_num_pulses': args.pvq_num_pulses, 'state_dropout_rate': args.state_dropout_rate, 'softquant': softquant, 'chunks_per_offset': args.chunks_per_offset, 'adapt': adapt}
 model = RDOVAE(*checkpoint['model_args'], **checkpoint['model_kwargs'])
 
 if type(args.initial_checkpoint) != type(None):
@@ -160,6 +162,8 @@ if __name__ == '__main__':
 
     # push model to device
     model.to(device)
+    idct = IDCT(18, device=device)
+    distortion_loss = dist_func(idct)
 
     # training loop
 
@@ -205,8 +209,8 @@ if __name__ == '__main__':
                 statistical_model   = model_output['statistical_model']
 
                 if type(args.initial_checkpoint) == type(None):
-                    latent_lambda = (1. - .5/(1.+batch/1000))
-                    state_lambda = (1. - .9/(1.+batch/6000))
+                    latent_lambda = (1. - .9/(1.+batch/1000))
+                    state_lambda = (1. - .99/((1.+batch/100000)**2))
                 else:
                     latent_lambda = 1.
                     state_lambda = 1.
