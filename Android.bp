@@ -34,8 +34,8 @@ license {
     ],
 }
 
-cc_defaults {
-    name: "libopus-default",
+cc_library {
+    name: "libopus",
     vendor_available: true,
     host_supported: true,
 
@@ -263,6 +263,7 @@ cc_defaults {
                 "-DOPUS_ARM_MAY_HAVE_NEON_INTR",
                 "-DOPUS_ARM_PRESUME_NEON",
                 "-DOPUS_ARM_INLINE_NEON",
+                "-DOPUS_HAVE_RTCD",
             ],
         },
 
@@ -293,6 +294,7 @@ cc_defaults {
                 "-DOPUS_ARM_MAY_HAVE_AARCH64_NEON_INTR",
                 "-DOPUS_ARM_MAY_HAVE_DOTPROD",
                 "-DOPUS_ARM_PRESUME_DOTPROD",
+                "-DOPUS_HAVE_RTCD",
             ],
         },
 
@@ -399,119 +401,7 @@ cc_defaults {
         "com.android.media.swcodec",
         "com.android.bt",
     ],
-    min_sdk_version: "apex_inherit",
-}
-
-cc_library {
-    name: "libopus",
-
-    defaults: ["libopus-default"],
-
-    arch: {
-        arm: {
-            cflags: [
-                "-DOPUS_HAVE_RTCD",
-            ],
-        },
-
-        arm64: {
-            cflags: [
-                "-DOPUS_HAVE_RTCD",
-            ],
-        },
-    },
-}
-
-cc_library_static {
-    name: "libopus_lfi",
-    export_include_dirs: ["include"],
-    min_sdk_version: "apex_inherit",
-    apex_available: [
-        "com.android.media.swcodec",
-    ],
-    static_libs: ["liblfi"],
-    sanitize: {
-        hwaddress: false,
-        memtag_heap: false,
-        memtag_globals: false,
-        memtag_stack: false,
-    },
-
-    stl: "none",
-    lfi_libs: [
-        "libopus_lfi_bin",
-    ],
-
-    arch: {
-        arm: {
-            enabled: false,
-        },
-        arm64: {
-            enabled: true,
-        },
-        x86: {
-            enabled: false,
-        },
-        x86_64: {
-            enabled: false,
-        },
-    },
-}
-
-cc_binary {
-    name: "libopus_lfi_bin",
-    vendor_available: false,
-    host_supported: false,
-    defaults: ["libopus-default"],
-    local_include_dirs: ["include"],
-    sanitize: {
-        hwaddress: false,
-        memtag_heap: false,
-        memtag_globals: false,
-        memtag_stack: false,
-    },
-
-    whole_static_libs: [
-        "libboxrt_minimal",
-    ],
-
-    static_libs: [
-        "liballocator",
-        "libc_lfi",
-        "libm_lfi",
-    ],
-
-    cflags: [
-        "-DOVERRIDE_celt_fatal",
-        "-U_FORTIFY_SOURCE",
-    ],
-
-    srcs: [
-        "android/celt_fatal.c",
-    ],
-
-    stl: "none",
-    system_shared_libs: [],
-    lfi_supported: true,
-    lfi: {
-        enabled: true,
-    },
-    static_executable: true,
-    version_script: "symbols.map.txt",
-    arch: {
-        arm: {
-            enabled: false,
-        },
-        arm64: {
-            enabled: true,
-        },
-        x86: {
-            enabled: false,
-        },
-        x86_64: {
-            enabled: false,
-        },
-    },
+    min_sdk_version: "29",
 }
 
 cc_binary {
